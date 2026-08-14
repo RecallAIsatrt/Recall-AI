@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>知学 AI · 大学生智能问答 · 高保真设计</title>
+<style>
+  :root{
+    --brand1:#007AFF; --brand2:#5AC8FA;
+    --brand-grad:linear-gradient(135deg,#007AFF,#5AC8FA);
+    --bg:#F5F5F7; --surface:#FFFFFF;
+    --line:#E3E3E8; --line2:#D2D2D7;
+    --ink:#1D1D1F; --sub:#515154; --muted:#86868B;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.04);
+    --shadow:0 6px 24px rgba(0,0,0,.06);
+    --shadow-brand:0 8px 24px rgba(0,122,255,.20);
+    --radius:14px; --radius-lg:18px;
+    --font:"PingFang SC","Helvetica Neue",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;}
+
+  /* 顶部栏 */
+  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:24px;
+    padding:0 28px;height:64px;background:rgba(255,255,255,.82);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:11px;cursor:pointer;}
+  .logo{width:38px;height:38px;border-radius:11px;background:var(--brand-grad);
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-brand);}
+  .logo svg{width:21px;height:21px;}
+  .brand-name{font-size:18px;font-weight:700;letter-spacing:.3px;}
+  .brand-tag{font-size:11px;color:var(--muted);margin-top:1px;}
+  .nav{display:flex;gap:6px;margin-left:14px;}
+  .nav a{font-size:14px;color:var(--sub);text-decoration:none;padding:8px 14px;border-radius:10px;cursor:pointer;transition:.18s;}
+  .nav a:hover{background:#EEF4FF;color:var(--brand1);}
+  .nav a.active{background:var(--brand-grad);color:#fff;box-shadow:var(--shadow-brand);}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+  .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;
+    display:flex;align-items:center;justify-content:center;color:var(--sub);cursor:pointer;transition:.18s;}
+  .icon-btn:hover{border-color:var(--brand1);color:var(--brand1);}
+  .icon-btn svg{width:18px;height:18px;}
+  .avatar{width:38px;height:38px;border-radius:50%;background:var(--brand-grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;}
+
+  /* 布局 */
+  .page{max-width:1280px;margin:0 auto;padding:22px 28px 40px;}
+  .hidden{display:none !important;}
+
+  /* ===== 对话页 ===== */
+  .chat-layout{display:flex;gap:18px;align-items:stretch;height:calc(100vh - 64px - 44px);min-height:560px;}
+  .chat-side{width:262px;flex:0 0 262px;display:flex;flex-direction:column;gap:14px;}
+  .chat-main{flex:1;min-width:0;display:flex;flex-direction:column;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow);overflow:hidden;}
+
+  .side-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;box-shadow:var(--shadow-sm);}
+  .side-title{font-size:13px;font-weight:600;color:var(--sub);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+  .new-chat{width:100%;border:none;background:var(--brand-grad);color:#fff;font-size:14px;font-weight:600;
+    padding:11px;border-radius:10px;cursor:pointer;box-shadow:var(--shadow-brand);transition:.18s;}
+  .new-chat:hover{filter:brightness(1.05);}
+  .conv{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;cursor:pointer;color:var(--sub);font-size:13.5px;transition:.15s;}
+  .conv:hover{background:#F1F6FF;}
+  .conv.active{background:#E9F2FF;color:var(--brand1);font-weight:600;}
+  .conv .dot{width:7px;height:7px;border-radius:50%;background:var(--brand2);flex:0 0 auto;}
+  .conv .meta{margin-left:auto;font-size:11px;color:var(--muted);}
+  .group-label{font-size:11px;color:var(--muted);margin:12px 4px 6px;letter-spacing:.4px;}
+
+  /* 聊天区 */
+  .chat-head{padding:14px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;}
+  .chat-head .ttl{font-size:15px;font-weight:600;}
+  .chat-head .sub{font-size:12px;color:var(--muted);}
+  .chat-head .pill{margin-left:auto;font-size:12px;color:var(--brand1);background:#E9F2FF;padding:4px 10px;border-radius:20px;}
+  .chat-scroll{flex:1;overflow-y:auto;padding:24px 28px;background:
+    radial-gradient(1200px 380px at 78% -8%, rgba(0,122,255,.10), transparent 60%),
+    radial-gradient(900px 320px at 6% 4%, rgba(90,200,250,.08), transparent 55%);}
+  .msg{max-width:76%;margin-bottom:18px;display:flex;gap:12px;}
+  .msg .av{width:34px;height:34px;border-radius:10px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
+  .msg.bot .av{background:var(--brand-grad);color:#fff;}
+  .msg.me{align-self:flex-end;flex-direction:row-reverse;margin-left:auto;}
+  .msg.me .av{background:#E2E8F0;color:var(--sub);}
+  .bubble{padding:12px 15px;border-radius:14px;font-size:14px;line-height:1.65;}
+  .msg.bot .bubble{background:#fff;border:1px solid var(--line);border-top-left-radius:4px;box-shadow:var(--shadow-sm);}
+  .msg.me .bubble{background:var(--brand-grad);color:#fff;border-top-right-radius:4px;}
+  .bubble code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:rgba(15,23,42,.06);padding:1px 6px;border-radius:5px;}
+  .msg.me .bubble code{background:rgba(255,255,255,.22);}
+
+  .welcome{text-align:center;padding:40px 20px 8px;}
+  .welcome .big{font-size:23px;font-weight:700;background:var(--brand-grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .welcome .desc{color:var(--sub);font-size:14px;margin:10px 0 22px;}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:640px;margin:0 auto;}
+  .chip{border:1px solid var(--line2);background:#fff;color:var(--sub);font-size:13.5px;padding:9px 15px;border-radius:22px;cursor:pointer;transition:.16s;}
+  .chip:hover{border-color:var(--brand1);color:var(--brand1);box-shadow:var(--shadow-sm);}
+
+  .composer{padding:14px 22px 18px;border-top:1px solid var(--line);background:var(--surface);}
+  .composer-box{display:flex;align-items:flex-end;gap:10px;border:1px solid var(--line2);border-radius:16px;
+    padding:10px 12px;background:#fff;transition:.18s;}
+  .composer-box:focus-within{border-color:var(--brand1);box-shadow:0 0 0 3px rgba(0,122,255,.15);}
+  .composer-box textarea{flex:1;border:none;outline:none;resize:none;font-family:var(--font);font-size:14px;max-height:120px;line-height:1.5;color:var(--ink);background:transparent;}
+  .send{width:40px;height:40px;border-radius:12px;border:none;background:var(--brand-grad);color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;box-shadow:var(--shadow-brand);transition:.16s;}
+  .send:hover{filter:brightness(1.06);}
+  .send svg{width:19px;height:19px;}
+  .composer-hint{font-size:11.5px;color:var(--muted);margin-top:8px;text-align:center;}
+
+  /* ===== 知识库页 ===== */
+  .kb-head{margin-bottom:18px;}
+  .kb-head h2{font-size:22px;font-weight:700;}
+  .kb-head p{color:var(--sub);font-size:14px;margin-top:4px;}
+  .section-title{font-size:15px;font-weight:600;margin:26px 0 14px;display:flex;align-items:center;gap:8px;}
+  .section-title .line{width:4px;height:16px;border-radius:3px;background:var(--brand-grad);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+  .kcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    box-shadow:var(--shadow-sm);transition:.18s;cursor:pointer;position:relative;overflow:hidden;}
+  .kcard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--line2);}
+  .kcard .ic{width:42px;height:42px;border-radius:12px;background:#E9F2FF;color:var(--brand1);
+    display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+  .kcard .ic svg{width:22px;height:22px;}
+  .kcard h3{font-size:15.5px;font-weight:600;}
+  .kcard p{font-size:13px;color:var(--muted);margin-top:5px;}
+  .kcard .count{position:absolute;top:16px;right:16px;font-size:12px;color:var(--brand1);background:#E9F2FF;padding:3px 9px;border-radius:20px;}
+
+  .qrow{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.15s;}
+  .qrow:hover{border-color:var(--brand1);background:#F0F7FF;}
+  .qrow .qmark{width:30px;height:30px;border-radius:9px;background:var(--brand-grad);color:#fff;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;}
+  .qrow .qt{font-size:14px;}
+  .qrow .qm{margin-left:auto;font-size:12px;color:var(--muted);}
+
+  .two-col-kb{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:start;}
+  @media(max-width:900px){.two-col-kb{grid-template-columns:1fr;}.chat-side{display:none;}}
+
+  .footnote{text-align:center;color:var(--muted);font-size:12px;padding:26px 0 6px;}
+</style>
+</head>
+<body>
+
+<!-- 顶部栏 -->
+<div class="topbar">
+  <div class="brand" onclick="switchView('chat')">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.5-.7L3 21l1.7-5.5A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">知学 AI</div>
+      <div class="brand-tag">大学生智能学习问答</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <a id="nav-chat" class="active" onclick="switchView('chat')">对话</a>
+    <a id="nav-kb" onclick="switchView('kb')">知识库</a>
+    <a id="nav-me" onclick="switchView('me')">我的</a>
+  </nav>
+  <div class="top-right">
+    <div class="icon-btn" title="搜索">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+    </div>
+    <div class="avatar">林</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ============ 对话页 ============ -->
+  <div id="view-chat">
+    <div class="chat-layout">
+      <!-- 左：会话列表 -->
+      <div class="chat-side">
+        <div class="side-card">
+          <button class="new-chat" onclick="newChat()">+ 新建对话</button>
+        </div>
+        <div class="side-card" style="flex:1;display:flex;flex-direction:column;">
+          <div class="side-title">历史对话</div>
+          <div class="conv active" data-name="高数·极限计算"><span class="dot"></span>高数·极限计算<span class="meta">今天</span></div>
+          <div class="conv" data-name="英语·定语从句"><span class="dot"></span>英语·定语从句<span class="meta">昨天</span></div>
+          <div class="conv" data-name="数据结构·二叉树"><span class="dot"></span>数据结构·二叉树<span class="meta">周三</span></div>
+          <div class="conv" data-name="考研政治·马原"><span class="dot"></span>考研政治·马原<span class="meta">上周</span></div>
+          <div class="group-label">分组</div>
+          <div class="conv" data-name="置顶·论文致谢"><span class="dot"></span>置顶·论文致谢</div>
+          <div class="conv" data-name="收藏·公式推导"><span class="dot"></span>收藏·公式推导</div>
+        </div>
+      </div>
+
+      <!-- 右：聊天区 -->
+      <div class="chat-main">
+        <div class="chat-head">
+          <div>
+            <div class="ttl" id="chatTitle">高数·极限计算</div>
+            <div class="sub">由 知学 AI 提供解答 · 内容仅供参考</div>
+          </div>
+          <div class="pill">深度思考模式</div>
+        </div>
+
+        <div class="chat-scroll" id="chatScroll">
+          <div class="welcome" id="welcome">
+            <div class="big">嗨，我是知学 AI 👋</div>
+            <div class="desc">课程答疑、论文思路、考研复习、代码调试，随时问我。</div>
+            <div class="chips">
+              <div class="chip" onclick="sendChip('帮我推导洛必达法则的适用条件')">洛必达法则适用条件</div>
+              <div class="chip" onclick="sendChip('英语定语从句和同位语从句怎么区分')">定语从句 vs 同位语从句</div>
+              <div class="chip" onclick="sendChip('用 Python 实现快速排序')">Python 实现快排</div>
+              <div class="chip" onclick="sendChip('帮我列一份考研数学复习计划')">考研数学复习计划</div>
+            </div>
+          </div>
+
+          <div class="msg bot">
+            <div class="av">AI</div>
+            <div class="bubble">你好！关于「极限计算」，常见方法包括：<br>① 代入法　② 因式分解约分　③ 有理化　④ <code>洛必达法则</code>　⑤ 等价无穷小替换。<br>你想从哪一类题开始？我可以一步步带你做。</div>
+          </div>
+          <div class="msg me">
+            <div class="av">林</div>
+            <div class="bubble">求 lim(x→0) (sin x − x) / x³</div>
+          </div>
+          <div class="msg bot">
+            <div class="av">AI</div>
+            <div class="bubble">这是 <code>0/0</code> 型，用洛必达法则：<br>原式 = lim (cos x − 1) / 3x² = lim (−sin x) / 6x = <b>−1/6</b>。<br>也可以用泰勒展开 sin x ≈ x − x³/6，一步得到结果。</div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-box">
+            <textarea id="input" rows="1" placeholder="输入你的问题，Enter 发送，Shift+Enter 换行…" onkeydown="onKey(event)" oninput="autoGrow(this)"></textarea>
+            <button class="send" onclick="send()" title="发送">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+            </button>
+          </div>
+          <div class="composer-hint">知学 AI 可能会出错，请核对关键信息 · 支持公式、代码与文件上传</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 知识库页 ============ -->
+  <div id="view-kb" class="hidden">
+    <div class="kb-head">
+      <h2>知识库</h2>
+      <p>按学科与场景整理高频问题与精品解答，帮你快速定位。</p>
+    </div>
+
+    <div class="two-col-kb">
+      <div>
+        <div class="section-title"><span class="line"></span>按学科浏览</div>
+        <div class="grid">
+          <div class="kcard"><div class="count">328</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg></div><h3>高等数学</h3><p>极限 · 微积分 · 级数</p></div>
+          <div class="kcard"><div class="count">256</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg></div><h3>大学英语</h3><p>语法 · 阅读 · 写作</p></div>
+          <div class="kcard"><div class="count">198</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div><h3>程序设计</h3><p>算法 · 数据结构 · 调试</p></div>
+          <div class="kcard"><div class="count">174</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><h3>考研复习</h3><p>数学 · 政治 · 英语规划</p></div>
+          <div class="kcard"><div class="count">142</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><h3>专业课</h3><p>各科核心概念梳理</p></div>
+          <div class="kcard"><div class="count">96</div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><h3>论文写作</h3><p>选题 · 框架 · 润色</p></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title"><span class="line"></span>热门提问</div>
+        <div class="qrow"><div class="qmark">Q</div><div class="qt">如何快速理解矩阵的秩？</div><div class="qm">1.2k 次</div></div>
+        <div class="qrow"><div class="qmark">Q</div><div class="qt">考研英语阅读怎么提分？</div><div class="qm">980 次</div></div>
+        <div class="qrow"><div class="qmark">Q</div><div class="qt">二叉树遍历的递归写法</div><div class="qm">860 次</div></div>
+        <div class="qrow"><div class="qmark">Q</div><div class="qt">论文摘要怎么写更出彩？</div><div class="qm">740 次</div></div>
+        <div class="qrow"><div class="qmark">Q</div><div class="qt">线性代数重点梳理</div><div class="qm">690 次</div></div>
+
+        <div class="section-title"><span class="line"></span>我的收藏</div>
+        <div class="qrow"><div class="qmark">★</div><div class="qt">泰勒公式记忆口诀</div><div class="qm">收藏</div></div>
+        <div class="qrow"><div class="qmark">★</div><div class="qt">英语长难句拆解方法</div><div class="qm">收藏</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 我的页 ============ -->
+  <div id="view-me" class="hidden">
+    <div class="kb-head"><h2>我的</h2><p>账户、会员与偏好设置。</p></div>
+    <div class="two-col-kb">
+      <div class="kcard" style="padding:22px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+          <div class="avatar" style="width:54px;height:54px;font-size:20px;">林</div>
+          <div><div style="font-size:17px;font-weight:600;">林同学</div><div style="font-size:13px;color:var(--muted);">计算机科学 · 大三</div></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span class="pill" style="font-size:12px;color:var(--brand1);background:#E9F2FF;padding:5px 12px;border-radius:20px;">免费版</span>
+          <span style="font-size:12px;color:var(--sub);background:#F1F5F9;padding:5px 12px;border-radius:20px;">今日已问 12 次</span>
+        </div>
+      </div>
+      <div>
+        <div class="qrow"><div class="qmark">⚙</div><div class="qt">偏好设置（学科 / 语气 / 模式）</div></div>
+        <div class="qrow"><div class="qmark">★</div><div class="qt">我的收藏（28）</div></div>
+        <div class="qrow"><div class="qmark">↑</div><div class="qt">对话导出与记录</div></div>
+        <div class="qrow"><div class="qmark">$</div><div class="qt">升级会员</div></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footnote">高保真设计稿 · 极简科技风 + 浅蓝渐变品牌色 · 仅作视觉与交互示意</p>
+</div>
+
+<script>
+  function switchView(v){
+    ['chat','kb','me'].forEach(function(n){
+      document.getElementById('view-'+n).classList.toggle('hidden', n!==v);
+    });
+    ['chat','kb','me'].forEach(function(n){
+      document.getElementById('nav-'+n).classList.toggle('active', n===v);
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  var chatScroll=document.getElementById('chatScroll');
+  var input=document.getElementById('input');
+  var welcome=document.getElementById('welcome');
+
+  function autoGrow(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+  function onKey(e){
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  }
+
+  function newChat(){
+    switchView('chat');
+    document.getElementById('chatTitle').textContent='新对话';
+    chatScroll.innerHTML='';
+    welcome.style.display='block';
+    input.focus();
+  }
+
+  function sendChip(text){ input.value=text; send(); }
+
+  function appendMsg(role,html){
+    var m=document.createElement('div');
+    m.className='msg '+(role==='me'?'me':'bot');
+    var av=role==='me'?'林':'AI';
+    m.innerHTML='<div class="av">'+av+'</div><div class="bubble">'+html+'</div>';
+    chatScroll.appendChild(m);
+    chatScroll.scrollTop=chatScroll.scrollHeight;
+  }
+
+  function send(){
+    var text=input.value.trim();
+    if(!text) return;
+    if(welcome) welcome.style.display='none';
+    appendMsg('me', escapeHtml(text));
+    input.value=''; autoGrow(input);
+    setTimeout(function(){
+      appendMsg('bot','好的，我来处理你的问题：<b>'+escapeHtml(text)+'</b><br>这是高保真交互示意，接入真实模型后，这里会返回结构化解答（含公式、步骤与参考资料）。');
+    }, 650);
+  }
+
+  function escapeHtml(s){ return s.replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+  // 会话切换
+  document.querySelectorAll('.conv').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('.conv').forEach(function(x){x.classList.remove('active');});
+      c.classList.add('active');
+      document.getElementById('chatTitle').textContent=c.getAttribute('data-name');
+      switchView('chat');
+    });
+  });
+</script>
+</body>
+</html>

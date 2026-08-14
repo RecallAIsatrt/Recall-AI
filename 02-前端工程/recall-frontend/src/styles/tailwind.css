@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Recall 暗黑二次元风格全局样式 ── */
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+      'Helvetica Neue', Arial, sans-serif;
+    color: theme('colors.ink.primary');
+    background:
+      radial-gradient(1100px 520px at 88% -12%, rgba(139, 92, 246, 0.20), transparent 60%),
+      radial-gradient(820px 420px at -4% 0%, rgba(236, 72, 153, 0.14), transparent 55%),
+      radial-gradient(700px 360px at 50% 112%, rgba(34, 211, 238, 0.09), transparent 60%),
+      theme('colors.surface.secondary');
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  /* 渐变文字 */
+  .text-grad {
+    background: linear-gradient(135deg, #c4b5fd, #f9a8d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* 毛玻璃面板（暗） */
+  .glass {
+    @apply bg-surface/70 backdrop-blur-glass border border-white/10;
+  }
+
+  /* 毛玻璃侧栏 */
+  .glass-sidebar {
+    @apply bg-surface/80 backdrop-blur-glass border-r border-border;
+  }
+
+  /* 毛玻璃顶栏 + 霓虹下边线 */
+  .glass-topbar {
+    @apply bg-surface/80 backdrop-blur-glass border-b border-border relative;
+  }
+  .glass-topbar::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    opacity: 0.55;
+  }
+
+  /* 暗黑卡片 */
+  .mac-card {
+    @apply bg-surface rounded-card border border-border shadow-mac-sm
+           transition-all duration-mac ease-mac;
+  }
+  .mac-card:hover {
+    @apply border-primary/40 shadow-mac;
+  }
+
+  /* 按钮 */
+  .mac-btn {
+    @apply inline-flex items-center justify-center gap-1.5
+           font-medium rounded-btn px-4 h-9
+           transition-all duration-mac ease-mac cursor-pointer
+           border border-transparent;
+  }
+  .mac-btn-primary {
+    @apply mac-btn text-white active:scale-[0.97];
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    box-shadow: 0 0 16px rgba(167, 139, 250, 0.35);
+  }
+  .mac-btn-primary:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 0 26px rgba(236, 72, 153, 0.45);
+  }
+  .mac-btn-secondary {
+    @apply mac-btn bg-surface text-ink-primary border-border
+           hover:bg-surface-tertiary active:scale-[0.97];
+  }
+  .mac-btn-ghost {
+    @apply mac-btn text-primary hover:bg-primary-light active:scale-[0.97];
+  }
+  .mac-btn-danger {
+    @apply mac-btn text-error hover:bg-error/10 active:scale-[0.97];
+  }
+
+  /* 输入框 */
+  .mac-input {
+    @apply w-full h-9 px-3 rounded-btn bg-surface-tertiary border border-border
+           text-ink-primary placeholder:text-ink-tertiary
+           transition-all duration-mac ease-mac
+           focus:outline-none focus:border-primary focus:shadow-mac-focus;
+  }
+
+  /* 标签 */
+  .mac-tag {
+    @apply inline-flex items-center h-6 px-2.5 rounded-tag text-xs font-medium
+           bg-surface-tertiary text-ink-secondary border border-border;
+  }
+  .mac-tag-primary {
+    @apply mac-tag bg-primary-light text-primary border-primary/30;
+  }
+
+  /* 桌面隐喻 - 文件夹 */
+  .folder-item {
+    @apply flex items-center gap-2 px-3 py-2 rounded-btn cursor-pointer
+           transition-all duration-mac ease-mac
+           hover:bg-surface-tertiary text-ink-primary;
+  }
+  .folder-item.active {
+    @apply bg-primary-light text-primary font-medium;
+  }
+
+  /* 错题区域 */
+  .region-question {
+    @apply bg-question/10 border border-question/25 rounded-btn p-md;
+    border-left: 3px solid theme('colors.question');
+  }
+  .region-analysis {
+    @apply bg-analysis/10 border border-analysis/25 rounded-btn p-md;
+    border-left: 3px solid theme('colors.analysis');
+  }
+
+  /* 柔和动效 */
+  .animate-fade-in {
+    animation: fadeIn 0.25s ease;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.3s ease;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
